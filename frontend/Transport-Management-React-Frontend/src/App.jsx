@@ -67,8 +67,22 @@ function App() {
       <Provider store={store}>
         <GoogleOAuthProvider clientId="683203259162-ppmbf6io7gvae0qpv21m7suduvvuokin.apps.googleusercontent.com">
           <LoadScript 
-            googleMapsApiKey="AIzaSyC_QOHqCewQWCZakHfvDtN3Q9kOOCiqB9c"  
-            libraries={["places"]}
+            googleMapsApiKey="AIzaSyC_QOHqCewQWCZakHfvDtN3Q9kOOCiqB9c"
+            libraries={["places", "geometry"]}
+            onLoad={() => {
+              console.log('✅ Google Maps API loaded successfully');
+              // Test if services are available
+              if (window.google && window.google.maps) {
+                console.log('✅ Google Maps services available');
+                console.log('Places API:', window.google.maps.places ? '✅ Available' : '❌ Not available');
+                console.log('Geocoding API:', window.google.maps.Geocoder ? '✅ Available' : '❌ Not available');
+                console.log('Geometry API:', window.google.maps.geometry ? '✅ Available' : '❌ Not available');
+              }
+            }}
+            onError={(error) => {
+              console.error('❌ Google Maps API failed to load:', error);
+              alert('Google Maps failed to load. Please check your internet connection and API key.');
+            }}
           >
             <BrowserRouter>
               <AppRoutes />
