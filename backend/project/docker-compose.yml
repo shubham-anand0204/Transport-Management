@@ -1,0 +1,72 @@
+# ================================
+# Transport Management - Backend
+# Docker Compose Configuration
+# ================================
+
+services:
+  # Django Backend with Daphne (ASGI)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: transport-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-dev-key}
+      - DEBUG=${DEBUG:-False}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - DB_ENGINE=postgresql
+      - DB_NAME=${DB_NAME:-transport_db}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER:-}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - static_volume:/app/staticfiles
+    restart: unless-stopped
+    networks:
+      - transport-network
+
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: transport-db
+    environment:
+      - POSTGRES_DB=${DB_NAME:-transport_db}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-transport_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - transport-network
+
+  # Redis for Django Channels (WebSocket)
+  redis:
+    image: redis:7-alpine
+    container_name: transport-redis
+    restart: unless-stopped
+    networks:
+      - transport-network
+
+volumes:
+  postgres_data:
+  static_volume:
+
+networks:
+  transport-network:
+    driver: bridge

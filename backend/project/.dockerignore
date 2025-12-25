@@ -1,0 +1,49 @@
+# Virtual environment
+source/
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# SQLite database (use PostgreSQL in Docker)
+*.sqlite3
+db.sqlite3
+
+# Environment files (we'll pass these via docker-compose)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Tests and documentation
+tests/
+docs/
+*.md
+
+# Misc
+*.log
+*.pot
+*.pyc
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/

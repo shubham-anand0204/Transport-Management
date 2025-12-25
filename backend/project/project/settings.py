@@ -76,11 +76,15 @@ TEMPLATES = [
 WSGI_APPLICATION = "project.wsgi.application"
 ASGI_APPLICATION = 'project.asgi.application'
 
+# Redis configuration for Django Channels
+REDIS_HOST = config('REDIS_HOST', default='127.0.0.1')
+REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],  # Redis server address
+            "hosts": [(REDIS_HOST, REDIS_PORT)],  # Redis server address
             "capacity": 1500,  # default 100
             "expiry": 10,  # default 60
         },
